@@ -1,6 +1,3 @@
-environment:
-  - OLLAMA_API_KEY=65053633e7974697b8cbb5875eeed70e.gS1VhFVg9SUlLibH06C_wJev
-
 services:
   honeypot:
     build:
@@ -11,6 +8,8 @@ services:
     ports:
       - "2222:2222"
     command: ["python", "main.py"]
+    environment:
+      OLLAMA_API_KEY: ${5053633e7974697b8cbb5875eeed70e.gS1VhFVg9SUlLibH06C_wJev}
     volumes:
       - ../logs:/app/logs
       - ../keys:/app/keys
