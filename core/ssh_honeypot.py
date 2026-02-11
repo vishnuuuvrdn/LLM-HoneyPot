@@ -68,7 +68,12 @@ def handle_connection(client, addr):
     transport.add_server_key(HOST_KEY)
 
     server = FakeSSHServer()
-    transport.start_server(server=server)
+    try:
+        transport.start_server(server=server)
+    except Exception as e:
+        logger.debug(f"Non-SSH connection dropped: {e}")
+        return
+
 
     channel = transport.accept(20)
     if channel is None:
@@ -180,3 +185,4 @@ def start_honeypot(host="0.0.0.0", port=2222):
 # ===============================
 if __name__ == "__main__":
     start_honeypot()
+
