@@ -1,2 +1,34 @@
 environment:
   - OLLAMA_API_KEY=65053633e7974697b8cbb5875eeed70e.gS1VhFVg9SUlLibH06C_wJev
+
+services:
+  honeypot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: llm-honeypot
+    restart: unless-stopped
+    ports:
+      - "2222:2222"
+    command: ["python", "main.py"]
+    volumes:
+      - ../logs:/app/logs
+      - ../keys:/app/keys
+
+  dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: llm-honeypot-dashboard
+    restart: unless-stopped
+    depends_on:
+      - honeypot
+    ports:
+      - "5000:5000"
+    command: ["python", "dashboard/app.py"]
+    environment:
+      DASHBOARD_SECRET_KEY: "change-this-secret"
+      DASHBOARD_USERNAME: "admin"
+      DASHBOARD_PASSWORD: "change-this-password"
+    volumes:
+      - ../logs:/app/logs
