@@ -26,6 +26,8 @@ services:
       - "5000:5000"
     command: ["python", "dashboard/app.py"]
     environment:
+      OLLAMA_API_KEY: ${5053633e7974697b8cbb5875eeed70e.gS1VhFVg9SUlLibH06C_wJev}
+    environment:
       DASHBOARD_SECRET_KEY: "change-this-secret"
       DASHBOARD_USERNAME: "admin"
       DASHBOARD_PASSWORD: "change-this-password"
