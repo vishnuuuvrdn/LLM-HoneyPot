@@ -68,11 +68,7 @@ def handle_connection(client, addr):
     transport.add_server_key(HOST_KEY)
 
     server = FakeSSHServer()
-    try:
-        transport.start_server(server=server)
-    except Exception as e:
-        logger.debug(f"Non-SSH connection dropped: {e}")
-        return
+    transport.start_server(server=server)
 
 
     channel = transport.accept(20)
