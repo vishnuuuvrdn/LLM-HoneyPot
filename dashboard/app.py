@@ -10,7 +10,7 @@ sys.path.append(BASE_DIR)
 
 from core.ssh_honeypot import start_honeypot
 
-app = Flask(__name__)␊
+app = Flask(__name__)
 app.secret_key = os.getenv("DASHBOARD_SECRET_KEY", "llm-honeypot-secret-key")
 
 LOG_FILE = os.path.join(BASE_DIR, "logs", "attacks.json")
@@ -110,4 +110,5 @@ def start_honeypot_web():
 # ----------------- MAIN -----------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
