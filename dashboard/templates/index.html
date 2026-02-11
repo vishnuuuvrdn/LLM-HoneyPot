@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LLM Honeypot – SOC Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #020617;
+            color: #e5e7eb;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .navbar {
+            background-color: #020617;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .card {
+            background-color: #0f172a;
+            border-radius: 14px;
+            border: 1px solid #1e293b;
+        }
+
+        .metric {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        table th {
+            color: #cbd5f5;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        code {
+            color: #facc15;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-dark px-4 d-flex justify-content-between">
+        <div>
+            <span class="navbar-brand">🛡️ LLM Honeypot – SOC Dashboard</span>
+            <span class="text-secondary ms-2">Real-time Security Monitoring</span>
+        </div>
+
+        <!-- LOGOUT BUTTON -->
+        <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+    </nav>
+
+    <div class="container-fluid p-4">
+
+        <!-- KPI -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card p-4">
+                    <div class="text-secondary text-uppercase small">Total Attacks</div>
+                    <div class="metric">{{ total }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card p-4">
+                    <h6>Attack Types (MITRE)</h6>
+                    <div style="height:300px;">
+                        <canvas id="attackChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card p-4">
+                    <h6>Severity Distribution</h6>
+                    <div style="height:300px;">
+                        <canvas id="severityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECENT ATTACKS -->
+        <div class="card p-4">
+            <h5>Recent Attacker Activity</h5>
+
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Time (UTC)</th>
+                            <th>IP</th>
+                            <th>Command</th>
+                            <th>Attack</th>
+                            <th>Severity</th>
+                            <th>MITRE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in logs %}
+                        <tr>
+                            <td>{{ e.timestamp }}</td>
+                            <td>{{ e.ip }}</td>
+                            <td><code>{{ e.command }}</code></td>
+                            <td>{{ e.attack }}</td>
+                            <td>{{ e.severity }}</td>
+                            <td>{{ e.mitre }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHART SCRIPT -->
+    <script>
+        const attackLabels = {{ attack_types.keys() | list | tojson }};
+        const attackValues = {{ attack_types.values() | list | tojson }};
+
+        const severityLabels = {{ severity_levels.keys() | list | tojson }};
+        const severityValues = {{ severity_levels.values() | list | tojson }};
+
+        new Chart(document.getElementById("attackChart"), {
+            type: "doughnut",
+            data: {
+                labels: attackLabels,
+                datasets: [{
+                    data: attackValues,
+                    backgroundColor: [
+                        "#38bdf8",
+                        "#22c55e",
+                        "#facc15",
+                        "#fb7185",
+                        "#a855f7"
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { color: "#e5e7eb" }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById("severityChart"), {
+            type: "bar",
+            data: {
+                labels: severityLabels,
+                datasets: [{
+                    data: severityValues,
+                    backgroundColor: [
+                        "#22c55e",
+                        "#facc15",
+                        "#ef4444"
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: "#e5e7eb" } },
+                    y: {
+                        ticks: { color: "#e5e7eb" },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
